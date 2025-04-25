@@ -1,10 +1,3 @@
-//
-//  MainView.swift
-//  project-client
-//
-//  Created by Artur Anissimov on 15.04.2025.
-//
-
 import SwiftUI
 
 struct MainView: View {
@@ -12,6 +5,10 @@ struct MainView: View {
     @State private var origin = ""
     @State private var destination = ""
     @State private var selectedDate: Date = Date()
+    
+    var isValidForm: Bool {
+        !origin.isEmptyOrWhitespace || !destination.isEmptyOrWhitespace
+    }
     
     var body: some View {
         VStack {
@@ -81,7 +78,9 @@ struct MainView: View {
                     )
                     .cornerRadius(16)
                     .shadow(color: Color.purple.opacity(0.3), radius: 8, x: 0, y: 4)
+                    .opacity(isValidForm ? 1 : 0.6)
             }
+            .disabled(!isValidForm)
             .padding()
             
         }

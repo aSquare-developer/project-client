@@ -1,10 +1,3 @@
-//
-//  project_clientApp.swift
-//  project-client
-//
-//  Created by Artur Anissimov on 10.04.2025.
-//
-
 import SwiftUI
 
 @main

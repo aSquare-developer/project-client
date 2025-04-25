@@ -1,10 +1,3 @@
-//
-//  WelcomeScreen.swift
-//  project-client
-//
-//  Created by Artur Anissimov on 19.04.2025.
-//
-
 import SwiftUI
 
 final class LoaderFlag {
@@ -95,10 +88,6 @@ struct WelcomeScreen: View {
         ZStack {
             
             VStack {
-                
-                Spacer()
-                
-                Text("Logo section")
                 
                 Spacer()
                 
