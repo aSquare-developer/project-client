@@ -2,12 +2,48 @@ import SwiftUI
 
 struct MainView: View {
     
+    @EnvironmentObject private var model: DroppieModel
+    
     @State private var origin = ""
     @State private var destination = ""
     @State private var selectedDate: Date = Date()
     
+    @State private var errorMessage: String = ""
+    @State private var isNotificationVisible: Bool = false
+    
     var isValidForm: Bool {
-        !origin.isEmptyOrWhitespace || !destination.isEmptyOrWhitespace
+        !origin.isEmptyOrWhitespace && !destination.isEmptyOrWhitespace
+    }
+    
+    private func saveRoute() async {
+        let routeRequestDTO = RouteRequestDTO(origin: origin, destination: destination, createdAt: selectedDate)
+        
+        do {
+            let routeResponseDTO = try await model.saveRoute(routeRequestDTO)
+            
+            if routeResponseDTO.error {
+                errorMessage = routeResponseDTO.reason ?? ""
+            } else {
+                origin = ""
+                destination = ""
+                selectedDate = Date()
+            
+                withAnimation {
+                    isNotificationVisible = true
+                }
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    withAnimation {
+                        isNotificationVisible = false
+                    }
+                }
+            
+                print("Done!")
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+        
     }
     
     var body: some View {
@@ -18,9 +54,11 @@ struct MainView: View {
             VStack(spacing: 10) {
                 // Секция "Начальной точкой"
                 LocationSearchView(selectedAddress: $origin)
+                    .id("origin")
                 
                 // Секция "Конечной точкой"
                 LocationSearchView(selectedAddress: $destination)
+                    .id("destination")
                 
                 // Секция "Дата маршрута"
                 HStack {
@@ -47,6 +85,7 @@ struct MainView: View {
                                 LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]),
                                                startPoint: .leading,
                                                endPoint: .trailing)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
                             )
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
@@ -54,17 +93,21 @@ struct MainView: View {
                             )
                             .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
                     }
-                    .cornerRadius(12)
                     .padding(.trailing, 8)
                 }
+                
+                Text(errorMessage)
+                    .foregroundStyle(.red)
+                    .font(.subheadline)
             }
             .padding()
             
             Spacer()
             
             Button(action: {
-                // Твое действие здесь
-                print("Кнопка нажата")
+                Task {
+                    await saveRoute()
+                }
             }) {
                 Text("Добавить маршрут")
                     .fontWeight(.semibold)
@@ -84,6 +127,10 @@ struct MainView: View {
             .padding()
             
         }
+        .overlay(
+            NotificationView(message: "Your data successfully added!", isVisible: $isNotificationVisible),
+            alignment: .top
+        )
         
     }
 }
@@ -91,4 +138,5 @@ struct MainView: View {
 
 #Preview {
     MainView()
+        .environmentObject(DroppieModel())
 }

@@ -40,5 +40,30 @@ class DroppieModel: ObservableObject {
         return loginResponseDTO
     }
     
+    func saveRoute(_ routeRequestDTO: RouteRequestDTO) async throws -> RouteResponseDTO {
+        
+        let defaults = UserDefaults.standard
+        guard let userIdString = defaults.string(forKey: "userId"),
+              let userId = UUID(uuidString: userIdString)
+        else {
+            throw RouteResponseDTO(error: true, reason: "User ID not found.")
+        }
+        
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        
+        let data = try encoder.encode(routeRequestDTO)
+        
+        // /api/users/:userId/route
+        let resource = Resource(
+            url: Constants.Urls.saveRouteByUserId(userId: userId),
+            method: .post(data),
+            modelType: RouteResponseDTO.self)
+        
+        let newRoute = try await httpClient.load(resource)
+        
+        return newRoute
+    }
+    
     
 }

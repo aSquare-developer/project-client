@@ -11,8 +11,8 @@ struct LocationSearchView: View {
     
     @StateObject private var locationManager = LocationManager()
 
-    private let completer = MKLocalSearchCompleter()
-    private let searchDelegate = SearchCompleterDelegate()
+    @State private var completer = MKLocalSearchCompleter()
+    @State private var searchDelegate = SearchCompleterDelegate()
     
     var body: some View {
         
@@ -58,7 +58,7 @@ struct LocationSearchView: View {
                         }
                     }
                 }
-                .frame(maxHeight: 200)
+                .frame(maxHeight: 75)
                 .background(Color(.secondarySystemBackground))
                 .cornerRadius(12)
                 .shadow(radius: 4)
@@ -68,8 +68,8 @@ struct LocationSearchView: View {
         .onAppear {
             completer.delegate = searchDelegate
             searchDelegate.onUpdate = { completions in
-                withAnimation(.spring(duration: 1)) {
-                    self.results = Array(completions.prefix(3))
+                withAnimation(.spring(duration: 0.5)) {
+                    self.results = Array(completions.prefix(1))
                 }
             }
         }
@@ -135,6 +135,6 @@ struct LocationSearchView: View {
     }
 }
 
-#Preview {
-    LocationSearchView(selectedAddress: .constant(""))
-}
+//#Preview {
+//    LocationSearchView(selectedAddress: .constant(""))
+//}
