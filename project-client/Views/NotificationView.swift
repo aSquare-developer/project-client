@@ -7,22 +7,23 @@ struct NotificationView: View {
     
     var body: some View {
         if isVisible {
-            VStack {
-                Text(message)
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.green)
-                    .cornerRadius(8)
-                    .shadow(radius: 4)
-                    .transition(AnyTransition.move(edge: .top).combined(with: .opacity))
-                    .zIndex(1)
-                    .padding(.top, 20)
-                    .animation(.easeInOut(duration: 0.5), value: isVisible) // Добавлена анимация
-            }
-            .padding(.top, 20)
-            .frame(maxWidth: .infinity)
-            .animation(.easeInOut, value: isVisible)
+            Text(message)
+                .font(.headline)
+                .foregroundColor(.white)
+                .multilineTextAlignment(.leading)
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.green)
+                .cornerRadius(8)
+                .shadow(radius: 4)
+                .padding(.horizontal)
+                .padding(.top, 20)
+                .transition(.move(edge: .top).combined(with: .opacity))
+                .animation(.easeInOut(duration: 0.5), value: isVisible)
         }
     }
+}
+
+#Preview {
+    NotificationView(message: "Some important message that might be quite long", isVisible: .constant(true))
 }

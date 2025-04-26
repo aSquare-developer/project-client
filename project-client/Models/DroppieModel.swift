@@ -42,10 +42,7 @@ class DroppieModel: ObservableObject {
     
     func saveRoute(_ routeRequestDTO: RouteRequestDTO) async throws -> RouteResponseDTO {
         
-        let defaults = UserDefaults.standard
-        guard let userIdString = defaults.string(forKey: "userId"),
-              let userId = UUID(uuidString: userIdString)
-        else {
+        guard let userId = UserDefaults.standard.userId else {
             throw RouteResponseDTO(error: true, reason: "User ID not found.")
         }
         

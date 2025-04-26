@@ -4,7 +4,6 @@ import MapKit
 struct LocationSearchView: View {
     
     @Binding var selectedAddress: String
-    @State private var query: String = ""
     @State private var results: [MKLocalSearchCompletion] = []
     @FocusState private var isTextFieldFocused: Bool
     @State private var isSelecting: Bool = false
@@ -17,7 +16,7 @@ struct LocationSearchView: View {
     var body: some View {
         
         VStack {
-            TextField("Введите адрес", text: $query)
+            TextField("Введите адрес", text: $selectedAddress)
                 .padding()
                 .frame(maxWidth: .infinity, minHeight: 55, maxHeight: 55)
                 .background(Color(.secondarySystemBackground))
@@ -29,9 +28,9 @@ struct LocationSearchView: View {
                 .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
                 .transition(.move(edge: .top).combined(with: .opacity))
                 .focused($isTextFieldFocused)
-                .onChange(of: query) {
+                .onChange(of: selectedAddress) {
                     if !isSelecting {
-                        completer.queryFragment = query
+                        completer.queryFragment = selectedAddress
                     }
                 }
             
@@ -94,8 +93,6 @@ struct LocationSearchView: View {
             guard let placemark = response?.mapItems.first?.placemark else { return }
 
             selectedAddress = formatAddress(from: placemark)
-            query = selectedAddress
-            
             
             withAnimation(.spring(duration: 1)) {
                 results = []

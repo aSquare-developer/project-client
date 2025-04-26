@@ -9,7 +9,19 @@ class SearchCompleterDelegate: NSObject, MKLocalSearchCompleterDelegate {
     }
 
     func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
-        print("Ошибка поиска: \(error.localizedDescription)")
-        onUpdate([])
+        // Обработка ошибки
+        if let mkError = error as? MKError {
+            switch mkError.code {
+            case .unknown:
+                print("Неизвестная ошибка поиска.")
+            case .serverFailure:
+                print("Ошибка сервера при поиске.")
+            default:
+                print("Ошибка поиска: \(error.localizedDescription)")
+            }
+        } else {
+            print("Ошибка поиска: \(error.localizedDescription)")
+        }
+        onUpdate([])  // Возвращаем пустой список при ошибке
     }
 }
