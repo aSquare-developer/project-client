@@ -1,12 +1,5 @@
 import SwiftUI
 
-final class LoaderFlag {
-    var value: Bool
-    init(_ value: Bool) {
-        self.value = value
-    }
-}
-
 struct WelcomeScreen: View {
     
     @EnvironmentObject private var model: DroppieModel
@@ -56,83 +49,80 @@ struct WelcomeScreen: View {
 
     var body: some View {
         
-        ZStack {
+        VStack {
+                
+            Spacer()
             
-            VStack {
+            VStack(spacing: 16) {
+                TextField("Login", text: $username)
+                    .padding()
+                    .background(Color(.secondarySystemBackground))
+                    .cornerRadius(12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.blue.opacity(0.4), lineWidth: 1)
+                    )
+                    .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+                    .textInputAutocapitalization(.never)
                 
-                Spacer()
-                
-                VStack(spacing: 16) {
-                    TextField("Login", text: $username)
-                        .padding()
-                        .background(Color(.secondarySystemBackground))
-                        .cornerRadius(12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.blue.opacity(0.4), lineWidth: 1)
-                        )
-                        .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
-                        .textInputAutocapitalization(.never)
-                    
-                    SecureField("Password", text: $password)
-                        .padding()
-                        .background(Color(.secondarySystemBackground))
-                        .cornerRadius(12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.blue.opacity(0.4), lineWidth: 1)
-                        )
-                        .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
-                }
-                .padding()
-                
-                Spacer()
-                
-                VStack(spacing: 16) {
-                    Button(action: {
-                        Task {
-                            await loginTapped()
-                        }
-                    }) {
-                        Text("Login")
-                            .fontWeight(.semibold)
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(
-                                LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]),
-                                               startPoint: .leading,
-                                               endPoint: .trailing)
-                            )
-                            .cornerRadius(16)
-                            .shadow(color: Color.purple.opacity(0.3), radius: 8, x: 0, y: 4)
-                            .opacity(isValidForm ? 1 : 0.6)
-                    }
-                    .padding(.horizontal)
-                    .disabled(!isValidForm)
-                    
-                    Button(action: {
-                        Task {
-                            await registerTapped()
-                        }
-                    }) {
-                        Text("Registration")
-                            .fontWeight(.semibold)
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(
-                                LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]),
-                                               startPoint: .leading,
-                                               endPoint: .trailing)
-                            )
-                            .cornerRadius(16)
-                            .shadow(color: Color.purple.opacity(0.3), radius: 8, x: 0, y: 4)
-                    }
-                    .padding(.horizontal)
-                }
-                
+                SecureField("Password", text: $password)
+                    .padding()
+                    .background(Color(.secondarySystemBackground))
+                    .cornerRadius(12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.blue.opacity(0.4), lineWidth: 1)
+                    )
+                    .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
             }
+            .padding()
+            
+            Spacer()
+            
+            VStack(spacing: 16) {
+                Button(action: {
+                    Task {
+                        await loginTapped()
+                    }
+                }) {
+                    Text("Login")
+                        .fontWeight(.semibold)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]),
+                                           startPoint: .leading,
+                                           endPoint: .trailing)
+                        )
+                        .cornerRadius(16)
+                        .shadow(color: Color.purple.opacity(0.3), radius: 8, x: 0, y: 4)
+                        .opacity(isValidForm ? 1 : 0.6)
+                }
+                .padding(.horizontal)
+                .disabled(!isValidForm)
+                
+                Button(action: {
+                    Task {
+                        await registerTapped()
+                    }
+                }) {
+                    Text("Registration")
+                        .fontWeight(.semibold)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]),
+                                           startPoint: .leading,
+                                           endPoint: .trailing)
+                        )
+                        .cornerRadius(16)
+                        .shadow(color: Color.purple.opacity(0.3), radius: 8, x: 0, y: 4)
+                }
+                .padding(.horizontal)
+            }
+                
         }
         .navigationBarBackButtonHidden(true)
         .sheet(item: $appState.errorWrapper) { errorWrapper in
