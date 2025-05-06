@@ -1,29 +1,55 @@
 import SwiftUI
 
-struct NotificationView: View {
-    
-    let message: String
-    @Binding var isVisible: Bool
-    
-    var body: some View {
-        if isVisible {
-            Text(message)
-                .font(.headline)
-                .foregroundColor(.white)
-                .multilineTextAlignment(.leading)
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color.green)
-                .cornerRadius(8)
-                .shadow(radius: 4)
-                .padding(.horizontal)
-                .padding(.top, 20)
-                .transition(.move(edge: .top).combined(with: .opacity))
-                .animation(.easeInOut(duration: 0.5), value: isVisible)
+enum NotificationType {
+    case success
+    case warning
+    case error
+    case info
+
+    var icon: String {
+        switch self {
+        case .success: return "checkmark.circle.fill"
+        case .warning: return "exclamationmark.triangle.fill"
+        case .error: return "xmark.octagon.fill"
+        case .info: return "info.circle.fill"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .success: return .green
+        case .warning: return .orange
+        case .error: return .red
+        case .info: return .blue
         }
     }
 }
 
+struct NotificationView: View {
+    
+    let notificationWrapper: NotificationWrapper
+    
+    let type: NotificationType
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Image(systemName: type.icon)
+                .resizable()
+                .frame(width: 60, height: 60)
+                .foregroundColor(type.color)
+
+            Text(notificationWrapper.message)
+                .font(.body)
+                .multilineTextAlignment(.center)
+                .foregroundColor(.secondary)
+                .padding(.horizontal)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(.systemBackground).ignoresSafeArea())
+    }
+}
+
 #Preview {
-    NotificationView(message: "Some important message that might be quite long", isVisible: .constant(true))
+    NotificationView(notificationWrapper: NotificationWrapper(message: "Some message"), type: .success)
 }

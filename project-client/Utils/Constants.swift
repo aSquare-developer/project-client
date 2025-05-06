@@ -11,5 +11,9 @@ struct Constants {
         static func saveRouteByUserId(userId: UUID) -> URL {
             return URL(string: "\(baseUrlPath)/users/\(userId)/route")!
         }
+        
+        static func getRoutesByUserId(userId: UUID) -> URL {
+            return URL(string: "\(baseUrlPath)/users/\(userId)/routes")!
+        }
     }
 }

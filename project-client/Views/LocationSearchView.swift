@@ -94,7 +94,7 @@ struct LocationSearchView: View {
 
             selectedAddress = formatAddress(from: placemark)
             
-            withAnimation(.spring(duration: 1)) {
+            withAnimation() {
                 results = []
                 
                 // Закрываем клавиатуру и снимаем фокус

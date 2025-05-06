@@ -10,6 +10,8 @@ This model usually called Aggregate Model
 
 class DroppieModel: ObservableObject {
     
+    @Published var routesList: [RouteResponseDTO] = []
+    
     let httpClient = HTTPClient()
     
     func register(username: String, password: String) async throws -> RegisterResponseDTO {
@@ -40,6 +42,12 @@ class DroppieModel: ObservableObject {
         return loginResponseDTO
     }
     
+    func logout() {
+        let defaults = UserDefaults.standard
+        defaults.removeObject(forKey: "userId")
+        defaults.removeObject(forKey: "authToken")
+    }
+    
     func saveRoute(_ routeRequestDTO: RouteRequestDTO) async throws -> RouteResponseDTO {
         
         guard let userId = UserDefaults.standard.userId else {
@@ -51,7 +59,6 @@ class DroppieModel: ObservableObject {
         
         let data = try encoder.encode(routeRequestDTO)
         
-        // /api/users/:userId/route
         let resource = Resource(
             url: Constants.Urls.saveRouteByUserId(userId: userId),
             method: .post(data),
@@ -60,6 +67,20 @@ class DroppieModel: ObservableObject {
         let newRoute = try await httpClient.load(resource)
         
         return newRoute
+    }
+    
+    func getAllRoutesByUser() async throws {
+        
+        guard let userId = UserDefaults.standard.userId else {
+            throw RouteResponseDTO(error: true, reason: "User ID not found.")
+        }
+        
+        let resource = Resource(
+            url: Constants.Urls.getRoutesByUserId(userId: userId),
+            modelType: [RouteResponseDTO].self)
+        
+        routesList = try await httpClient.load(resource)
+        
     }
     
     

@@ -14,72 +14,43 @@ struct WelcomeScreen: View {
     
     @State private var username: String = ""
     @State private var password: String = ""
-    @State private var errorRegistrationMessage: String = ""
-    
-    @State private var isLoading = false
     
     var isValidForm: Bool {
         !username.isEmptyOrWhitespace && !password.isEmptyOrWhitespace
     }
     
     private func loginTapped() async {
-        let showLoader = LoaderFlag(true)
-
-        Task {
-            try? await Task.sleep(nanoseconds: 300_000_000)
-            if showLoader.value {
-                await MainActor.run { isLoading = true }
-            }
-        }
-
-        defer {
-            showLoader.value = false
-            Task { await MainActor.run { isLoading = false } }
-        }
-
         do {
             let loginResponseDTO = try await model.login(username: username, password: password)
 
             if loginResponseDTO.error {
-                errorRegistrationMessage = loginResponseDTO.reason ?? ""
+                appState.errorWrapper = ErrorWrapper(
+                    error: DroppieError.login,
+                    guidance: loginResponseDTO.reason ?? "")
             } else {
                 appState.routes.append(.main)
             }
         } catch {
-            errorRegistrationMessage = error.localizedDescription
+            appState.errorWrapper = ErrorWrapper(error: error, guidance: error.localizedDescription)
         }
     }
 
     private func registerTapped() async {
         if !isValidForm {
-            errorRegistrationMessage = "To register, you must fill in the fields"
+            appState.errorWrapper = ErrorWrapper(error: DroppieError.fieldsIsInvalid, guidance: "To register, you must fill in the fields")
             return
         }
-
-        let showLoader = LoaderFlag(true)
-
-        Task {
-            try? await Task.sleep(nanoseconds: 300_000_000)
-            if showLoader.value {
-                await MainActor.run { isLoading = true }
-            }
-        }
-
-        defer {
-            showLoader.value = false
-            Task { await MainActor.run { isLoading = false } }
-        }
-
+        
         do {
             let registerResponseDTO = try await model.register(username: username, password: password)
 
             if registerResponseDTO.error {
-                errorRegistrationMessage = registerResponseDTO.reason ?? ""
+                appState.errorWrapper = ErrorWrapper(error: DroppieError.register, guidance: registerResponseDTO.reason ?? "")
             } else {
                 await loginTapped()
             }
         } catch {
-            errorRegistrationMessage = error.localizedDescription
+            appState.errorWrapper = ErrorWrapper(error: error, guidance: error.localizedDescription)
         }
     }
 
@@ -112,11 +83,6 @@ struct WelcomeScreen: View {
                                 .stroke(Color.blue.opacity(0.4), lineWidth: 1)
                         )
                         .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
-                    
-                    Text(errorRegistrationMessage)
-                        .foregroundColor(.red)
-                        .font(.subheadline)
-                    
                 }
                 .padding()
                 
@@ -167,10 +133,11 @@ struct WelcomeScreen: View {
                 }
                 
             }
-            
-            if isLoading {
-                LoadingView(message: "Please wait, logging in...")
-            }
+        }
+        .navigationBarBackButtonHidden(true)
+        .sheet(item: $appState.errorWrapper) { errorWrapper in
+            ErrorView(errorWrapper: errorWrapper)
+                .presentationDetents([.fraction(0.35)])
         }
     }
 }

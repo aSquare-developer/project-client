@@ -3,45 +3,33 @@ import SwiftUI
 struct MainView: View {
     
     @EnvironmentObject private var model: DroppieModel
+    @EnvironmentObject private var appState: AppState
     
     @State private var origin = ""
     @State private var destination = ""
     @State private var selectedDate: Date = Date()
-    
-    @State private var errorMessage: String = ""
-    @State private var isNotificationVisible: Bool = false
     
     var isValidForm: Bool {
         !origin.isEmptyOrWhitespace && !destination.isEmptyOrWhitespace
     }
     
     private func saveRoute() async {
-        let routeRequestDTO = RouteRequestDTO(origin: origin, destination: destination, createdAt: selectedDate)
+        let routeRequestDTO = RouteRequestDTO(origin: origin, destination: destination, date: selectedDate)
         
         do {
             let routeResponseDTO = try await model.saveRoute(routeRequestDTO)
             
             if routeResponseDTO.error {
-                errorMessage = routeResponseDTO.reason ?? ""
+                appState.errorWrapper = ErrorWrapper(error: DroppieError.saveRouteError,
+                                                     guidance: routeResponseDTO.reason ?? "")
             } else {
                 origin = ""
                 destination = ""
                 selectedDate = Date()
-            
-                withAnimation {
-                    isNotificationVisible = true
-                }
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                    withAnimation {
-                        isNotificationVisible = false
-                    }
-                }
-            
-                print("Done!")
+                appState.notificationWrapper = NotificationWrapper(message: "Your Route successfully added!")
             }
         } catch {
-            print(error.localizedDescription)
+            appState.errorWrapper = ErrorWrapper(error: error, guidance: error.localizedDescription)
         }
         
     }
@@ -75,7 +63,6 @@ struct MainView: View {
                         .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
                     
                     Button(action: {
-                        print("Текущая дата выбрана")
                         selectedDate = Date()
                     }) {
                         Image(systemName: "calendar")
@@ -95,10 +82,6 @@ struct MainView: View {
                     }
                     .padding(.trailing, 8)
                 }
-                
-                Text(errorMessage)
-                    .foregroundStyle(.red)
-                    .font(.subheadline)
             }
             .padding()
             
@@ -127,11 +110,14 @@ struct MainView: View {
             .padding()
             
         }
-        .overlay(
-            NotificationView(message: "Your data successfully added!", isVisible: $isNotificationVisible),
-            alignment: .top
-        )
-        
+        .sheet(item: $appState.errorWrapper) { errorWrapper in
+            ErrorView(errorWrapper: errorWrapper)
+                .presentationDetents([.fraction(0.35)])
+        }
+        .sheet(item: $appState.notificationWrapper) { notificationWrapper in
+            NotificationView(notificationWrapper: notificationWrapper, type: .success)
+                .presentationDetents([.fraction(0.35)])
+        }
     }
 }
 
@@ -139,4 +125,5 @@ struct MainView: View {
 #Preview {
     MainView()
         .environmentObject(DroppieModel())
+        .environmentObject(AppState())
 }

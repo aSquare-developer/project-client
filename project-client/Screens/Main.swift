@@ -21,6 +21,7 @@ struct Main: View {
                     Text("Профиль")
                 }
         }
+        .navigationBarBackButtonHidden(true)
     }
 }
 
