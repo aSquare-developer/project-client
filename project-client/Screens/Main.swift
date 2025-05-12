@@ -6,19 +6,19 @@ struct Main: View {
             MainView()
                 .tabItem {
                     Image(systemName: "map")
-                    Text("Маршрут")
+                    Text("Routes")
                 }
 
-            Text("История")
+            Text("History")
                 .tabItem {
                     Image(systemName: "clock")
-                    Text("История")
+                    Text("History")
                 }
 
-            Text("Профиль")
+            ProfileView()
                 .tabItem {
                     Image(systemName: "person")
-                    Text("Профиль")
+                    Text("Profile")
                 }
         }
         .navigationBarBackButtonHidden(true)
