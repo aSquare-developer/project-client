@@ -23,9 +23,7 @@ struct project_clientApp: App {
                 }
                 .navigationDestination(for: Route.self) { route in
                     switch route {
-                    case .login:
-                        WelcomeScreen()
-                    case .register:
+                    case .login, .register:
                         WelcomeScreen()
                     case .main:
                         Main()

@@ -10,7 +10,7 @@ This model usually called Aggregate Model
 
 class DroppieModel: ObservableObject {
     
-    @Published var routesList: [RouteResponseDTO] = []
+    @Published var routesList: [RouteObject] = []
     
     let httpClient = HTTPClient()
     
@@ -69,6 +69,7 @@ class DroppieModel: ObservableObject {
         return newRoute
     }
     
+    @MainActor
     func getAllRoutesByUser() async throws {
         
         guard let userId = UserDefaults.standard.userId else {
@@ -77,9 +78,16 @@ class DroppieModel: ObservableObject {
         
         let resource = Resource(
             url: Constants.Urls.getRoutesByUserId(userId: userId),
-            modelType: [RouteResponseDTO].self)
+            modelType: [RouteObject].self)
         
-        routesList = try await httpClient.load(resource)
+        do {
+            let routes = try await httpClient.load(resource)
+            routesList = routes.sorted {
+                ($0.createdAt) > ($1.createdAt)
+            }
+        } catch {
+            print("Failed to load routes: \(error)")
+        }
         
     }
     

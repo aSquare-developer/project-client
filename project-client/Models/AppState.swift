@@ -12,6 +12,7 @@ enum DroppieError: Error {
     case fieldsIsInvalid
     case saveRouteError
     case successfullyAddedRoute
+    case fetchingError
 }
 
 class AppState: ObservableObject {

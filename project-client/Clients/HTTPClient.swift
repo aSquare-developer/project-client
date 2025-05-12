@@ -95,7 +95,10 @@ struct HTTPClient {
             throw NetworkError.invalidResponse
         }
         
-        guard let result = try? JSONDecoder().decode(resource.modelType, from: data) else {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        
+        guard let result = try? decoder.decode(resource.modelType, from: data) else {
             throw NetworkError.decodingError
         }
         

@@ -9,7 +9,7 @@ struct Main: View {
                     Text("Routes")
                 }
 
-            Text("History")
+            HistoryView()
                 .tabItem {
                     Image(systemName: "clock")
                     Text("History")
